@@ -1,12 +1,20 @@
 {
   "name": "esmile-gen",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Discord bot gen",
   "main": "index.js",
   "bin": {
     "gen": "index.js",
     "esmile-gen": "index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zastinian/Esmile-Gen.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Zastinian/Esmile-Gen/issues"
+  },
+  "homepage": "https://github.com/Zastinian/Esmile-Gen#readme",
   "scripts": {
     "start": "node index.js"
   },

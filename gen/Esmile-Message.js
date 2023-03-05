@@ -1,8 +1,8 @@
-const fs = require("fs")
-const path = require("path")
-const {execSync} = require("child_process")
-const chalk = require("chalk")
-const eventTemplates = require("./Esmile-Events")
+const fs = require("fs");
+const path = require("path");
+const {execSync} = require("child_process");
+const chalk = require("chalk");
+const eventTemplates = require("./Esmile-Events");
 
 function generateEsmileFile(dir, name) {
   const str = `{
@@ -11,8 +11,8 @@ function generateEsmileFile(dir, name) {
       "discord.js": "14.7.1"
     }
   }
-  `
-  fs.writeFileSync(path.join(dir, "esmile.json"), str)
+  `;
+  fs.writeFileSync(path.join(dir, "esmile.json"), str);
 }
 
 function generateConfigFile(dir, prefix, token) {
@@ -20,8 +20,8 @@ function generateConfigFile(dir, prefix, token) {
         prefix: "${prefix}",
         token: "${token}"
     }
-    `
-  fs.writeFileSync(path.join(dir, "config.js"), str)
+    `;
+  fs.writeFileSync(path.join(dir, "config.js"), str);
 }
 
 function generateMainFile(dir) {
@@ -44,9 +44,9 @@ function generateMainFile(dir) {
       await handlerEvents(client, '../events');
       await client.login(config.token);
     })();\n
-    `
+    `;
 
-  fs.writeFileSync(path.join(dir, "index.js"), str)
+  fs.writeFileSync(path.join(dir, "index.js"), str);
 }
 
 function generatePackageJSON(dir, name) {
@@ -66,8 +66,8 @@ function generatePackageJSON(dir, name) {
       "discord.js": "14.7.1"
     }
   }
-  `
-  fs.writeFileSync(path.join(dir, "package.json"), str)
+  `;
+  fs.writeFileSync(path.join(dir, "package.json"), str);
 }
 
 function generateMessageEvent(dir) {
@@ -90,8 +90,8 @@ function generateMessageEvent(dir) {
         }
       }
     }
-  }`
-  fs.writeFileSync(path.join(dir, "Message", "MessageEvent.js"), str)
+  }`;
+  fs.writeFileSync(path.join(dir, "Message", "MessageEvent.js"), str);
 }
 
 function generatePingCommand(dir) {
@@ -106,8 +106,8 @@ function generatePingCommand(dir) {
         content: 'Pong!'
       });
     }
-  }`
-  fs.writeFileSync(path.join(dir, "info", "ping.js"), str)
+  }`;
+  fs.writeFileSync(path.join(dir, "info", "ping.js"), str);
 }
 
 function generateReadyEvent(dir) {
@@ -121,8 +121,8 @@ function generateReadyEvent(dir) {
       console.log(client.user.tag + ' on.');
     }
   }
-  `
-  fs.writeFileSync(path.join(dir, "Ready", "ReadyEvent.js"), str)
+  `;
+  fs.writeFileSync(path.join(dir, "Ready", "ReadyEvent.js"), str);
 }
 
 function generateUtilFiles(dir, dir_struct) {
@@ -170,7 +170,7 @@ function generateUtilFiles(dir, dir_struct) {
   module.exports = { 
     handlerCommands, 
     handlerEvents,
-  };`
+  };`;
 
   const baseCommand = `module.exports = class BaseCommand {
     constructor(name, category, aliases) {
@@ -178,92 +178,92 @@ function generateUtilFiles(dir, dir_struct) {
       this.category = category;
       this.aliases = aliases;
     }
-  }`
+  }`;
 
   const baseEvent = `module.exports = class BaseEvent {
     constructor(name) {
       this.name = name;
     }
-  }`
+  }`;
 
-  fs.writeFileSync(path.join(dir, "handlers.js"), handler)
-  fs.writeFileSync(path.join(dir_struct, "BaseCommand.js"), baseCommand)
-  fs.writeFileSync(path.join(dir_struct, "BaseEvent.js"), baseEvent)
+  fs.writeFileSync(path.join(dir, "handlers.js"), handler);
+  fs.writeFileSync(path.join(dir_struct, "BaseCommand.js"), baseCommand);
+  fs.writeFileSync(path.join(dir_struct, "BaseEvent.js"), baseEvent);
 }
 
 function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1)
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-const getEventName = (name) => `${capitalize(name)}Event.js`
+const getEventName = (name) => `${capitalize(name)}Event.js`;
 
 async function generateEvents(events) {
-  console.log("Generating the selected events ...")
-  const di = path.join(process.cwd(), "src")
-  const dir = path.join(di, "events")
+  console.log("Generating the selected events ...");
+  const di = path.join(process.cwd(), "src");
+  const dir = path.join(di, "events");
   for (const event of events) {
-    const fileName = getEventName(event)
-    const template = await getTemplate(event)
+    const fileName = getEventName(event);
+    const template = await getTemplate(event);
     if (fs.existsSync(path.join(dir, fileName)))
       return console.log(
         chalk.red.bold("Error you already have that event if you want another one of the same event rename the one you already have!")
-      )
-    fs.writeFileSync(path.join(dir, fileName), template)
-    console.log(chalk.cyan(`Successfully generated ${event} event!`))
+      );
+    fs.writeFileSync(path.join(dir, fileName), template);
+    console.log(chalk.cyan(`Successfully generated ${event} event!`));
   }
-  return console.log(chalk.white.bold("The selected events were successfully generated!"))
+  return console.log(chalk.white.bold("The selected events were successfully generated!"));
 }
 
 async function getTemplate(event) {
-  return eventTemplates[event]
+  return eventTemplates[event];
 }
 
 function generateProject(name, dir, prefix, token) {
-  var projectPath
+  var projectPath;
   if (dir === "Inside") {
-    projectPath = path.join(process.cwd(), `${name}`)
-    if (fs.existsSync(projectPath)) return console.log(`The directory with name ${name} already exists`)
+    projectPath = path.join(process.cwd(), `${name}`);
+    if (fs.existsSync(projectPath)) return console.log(`The directory with name ${name} already exists`);
   } else if (dir === "Outside") {
-    projectPath = path.join(process.cwd())
+    projectPath = path.join(process.cwd());
   }
-  console.log("Generating project ...")
-  const srcPath = path.join(projectPath, "src")
-  const utilsPath = path.join(srcPath, "utils")
-  const commandsPath = path.join(srcPath, "commands")
-  const eventsPath = path.join(srcPath, "events")
-  const structuresPath = path.join(utilsPath, "structures")
-  const pingCommandFolder = path.join(commandsPath, "info")
-  const readyEventFolder = path.join(eventsPath, "Ready")
-  const messageEventFolder = path.join(eventsPath, "Message")
+  console.log("Generating project ...");
+  const srcPath = path.join(projectPath, "src");
+  const utilsPath = path.join(srcPath, "utils");
+  const commandsPath = path.join(srcPath, "commands");
+  const eventsPath = path.join(srcPath, "events");
+  const structuresPath = path.join(utilsPath, "structures");
+  const pingCommandFolder = path.join(commandsPath, "info");
+  const readyEventFolder = path.join(eventsPath, "Ready");
+  const messageEventFolder = path.join(eventsPath, "Message");
   if (dir === "Inside") {
-    fs.mkdirSync(projectPath)
+    fs.mkdirSync(projectPath);
   }
-  fs.mkdirSync(srcPath)
-  fs.mkdirSync(utilsPath)
-  fs.mkdirSync(commandsPath)
-  fs.mkdirSync(eventsPath)
-  fs.mkdirSync(structuresPath)
-  fs.mkdirSync(pingCommandFolder)
-  fs.mkdirSync(readyEventFolder)
-  fs.mkdirSync(messageEventFolder)
-  generateEsmileFile(projectPath, name)
-  generateConfigFile(srcPath, prefix, token)
-  generateMainFile(srcPath)
-  generatePackageJSON(projectPath, name)
-  generateMessageEvent(eventsPath)
-  generatePingCommand(commandsPath)
-  generateReadyEvent(eventsPath)
-  generateUtilFiles(utilsPath, structuresPath)
+  fs.mkdirSync(srcPath);
+  fs.mkdirSync(utilsPath);
+  fs.mkdirSync(commandsPath);
+  fs.mkdirSync(eventsPath);
+  fs.mkdirSync(structuresPath);
+  fs.mkdirSync(pingCommandFolder);
+  fs.mkdirSync(readyEventFolder);
+  fs.mkdirSync(messageEventFolder);
+  generateEsmileFile(projectPath, name);
+  generateConfigFile(srcPath, prefix, token);
+  generateMainFile(srcPath);
+  generatePackageJSON(projectPath, name);
+  generateMessageEvent(eventsPath);
+  generatePingCommand(commandsPath);
+  generateReadyEvent(eventsPath);
+  generateUtilFiles(utilsPath, structuresPath);
 
-  console.log("Installing dependencies ...")
-  execSync("npm install", {cwd: projectPath})
+  console.log("Installing dependencies ...");
+  execSync("npm install", {cwd: projectPath});
   if (dir === "Inside") {
-    console.log(`\n\tTo enter the project directory use cd ./${name}`)
+    console.log(`\n\tTo enter the project directory use cd ./${name}`);
   }
-  console.log(chalk.white.bold(`\tTo start the project use npm start`))
+  console.log(chalk.white.bold(`\tTo start the project use npm start`));
 }
 
 module.exports = {
   generateProject,
   generateEvents,
-}
+};

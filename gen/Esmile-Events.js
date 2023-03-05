@@ -733,6 +733,6 @@ const eventTemplates = {
       
     }
   }`,
-}
+};
 
-module.exports = eventTemplates
+module.exports = eventTemplates;

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-const inquirer = require("inquirer")
-const {generateProject, generateEvents} = require("./gen/Esmile-Message")
+const inquirer = require("inquirer");
+const {generateProject, generateEvents} = require("./gen/Esmile-Message");
 
 inquirer
   .prompt([
@@ -124,15 +124,15 @@ inquirer
   .then((data) => {
     if (data.command === "Create new project") {
       if (data.prefixorslash === "Prefix") {
-        const name = data.projectName.toLowerCase().replace(/\s+/g, "-")
-        const dir = data.selectDir
-        const prefix = data.prefix
-        const token = data.projectToken
-        generateProject(name, dir, prefix, token)
+        const name = data.projectName.toLowerCase().replace(/\s+/g, "-");
+        const dir = data.selectDir;
+        const prefix = data.prefix;
+        const token = data.projectToken;
+        generateProject(name, dir, prefix, token);
       }
     }
     if (data.command === "Generate event") {
-      const events = data.events
-      generateEvents(events)
+      const events = data.events;
+      generateEvents(events);
     }
-  })
+  });
