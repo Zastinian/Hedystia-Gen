@@ -2,17 +2,17 @@ const fs = require("fs");
 const path = require("path");
 const {execSync} = require("child_process");
 const chalk = require("chalk");
-const eventTemplates = require("./Esmile-Events");
+const eventTemplates = require("./Hedystia-Events");
 
-function generateEsmileFile(dir, name) {
+function generateHedystiaFile(dir, name) {
   const str = `{
     "project": "${name}",
     "lib": {
-      "discord.js": "14.7.1"
+      "discord.js": "14.9.0"
     }
   }
   `;
-  fs.writeFileSync(path.join(dir, "esmile.json"), str);
+  fs.writeFileSync(path.join(dir, "hedystia.json"), str);
 }
 
 function generateConfigFile(dir, prefix, token) {
@@ -246,7 +246,7 @@ function generateProject(name, dir, prefix, token) {
   fs.mkdirSync(pingCommandFolder);
   fs.mkdirSync(readyEventFolder);
   fs.mkdirSync(messageEventFolder);
-  generateEsmileFile(projectPath, name);
+  generateHedystiaFile(projectPath, name);
   generateConfigFile(srcPath, prefix, token);
   generateMainFile(srcPath);
   generatePackageJSON(projectPath, name);

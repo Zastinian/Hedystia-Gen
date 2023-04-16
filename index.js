@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const inquirer = require("inquirer");
-const {generateProject, generateEvents} = require("./gen/Esmile-Message");
+const {generateProject, generateEvents} = require("./gen/Hedystia-Message");
 
 inquirer
   .prompt([

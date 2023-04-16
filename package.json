@@ -1,20 +1,20 @@
 {
-  "name": "esmile-gen",
+  "name": "hedystia.gen",
   "version": "1.6.0",
   "description": "Discord bot gen",
   "main": "index.js",
   "bin": {
     "gen": "index.js",
-    "esmile-gen": "index.js"
+    "hedystia-gen": "index.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Zastinian/Esmile-Gen.git"
+    "url": "git+https://github.com/Zastinian/Hedystia-Gen.git"
   },
   "bugs": {
-    "url": "https://github.com/Zastinian/Esmile-Gen/issues"
+    "url": "https://github.com/Zastinian/Hedystia-Gen/issues"
   },
-  "homepage": "https://github.com/Zastinian/Esmile-Gen#readme",
+  "homepage": "https://github.com/Zastinian/Hedystia-Gen#readme",
   "scripts": {
     "start": "node index.js"
   },
@@ -24,7 +24,7 @@
     "bot gen",
     "gen"
   ],
-  "author": "contact@mresmile.com",
+  "author": "contact@hedystia.com",
   "license": "ISC",
   "dependencies": {
     "chalk": "4.1.2",

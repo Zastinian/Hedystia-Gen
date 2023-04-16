@@ -1,7 +1,7 @@
 ## Installation
 
 ```
-npm i --global esmile-gen
+npm i --global hedystia.gen
 ```
 
 ## Nodejs Version
@@ -10,7 +10,7 @@ npm i --global esmile-gen
 
 ## Links
 
-- [Discord](https://discord.gg/aXvuUpvRQs) [Esmile Discord]
+- [Discord](https://discord.gg/aXvuUpvRQs) [Hedystia Discord]
 
 ## Usage
 
