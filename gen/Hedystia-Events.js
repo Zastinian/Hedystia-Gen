@@ -1,738 +1,433 @@
+const fs = require("fs");
+const path = require("path");
+const chalk = require("chalk");
+
 const eventTemplates = {
   applicationCommandCreate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class ApplicationCommandCreateEvent extends BaseEvent {
-    constructor() {
-      super('applicationCommandCreate');
-    }
-
-    async run(client, command) {
-
-    }
-  }
+  module.exports = {
+    event_name: "applicationCommandCreate",
+    run: (client, interaction) => {},
+  };
     `,
   applicationCommandDelete: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class ApplicationCommandDeleteEvent extends BaseEvent {
-    constructor() {
-      super('applicationCommandDelete');
-    }
-
-    async run(client, command) {
-
-    }
-  }
+  module.exports = {
+    event_name: "applicationCommandDelete",
+    run: (client, interaction) => {},
+  };
     `,
   applicationCommandUpdate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class ApplicationCommandUpdateEvent extends BaseEvent {
-    constructor() {
-      super('applicationCommandUpdate');
-    }
-
-    async run(client, oldCommand, newCommand) {
-
-    }
-  }
+  module.exports = {
+    event_name: "applicationCommandUpdate",
+    run: (client, interaction) => {},
+  };
     `,
   guildMemberAvailable: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class GuildMemberAvailableEvent extends BaseEvent {
-    constructor() {
-      super('guildMemberAvailable');
-    }
-
-    async run(client, member) {
-
-    }
-  }
+  module.exports = {
+    event_name: "guildMemberAvailable",
+    run: (client, interaction) => {},
+  };
     `,
   guildMembersChunk: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class GuildMemberChunksEvent extends BaseEvent {
-    constructor() {
-      super('guildMembersChunk');
-    }
-    
-    async run(client, members, guild, chunk) {
-
-    }
-  }
+  module.exports = {
+    event_name: "guildMembersChunk",
+    run: (client, interaction) => {},
+  };
     `,
   interactionCreate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class InteractionCreateEvent extends BaseEvent {
-    constructor() {
-      super('interactionCreate');
-    }
-
-    async run(client, interaction) {
-
-    }
-  }
+  module.exports = {
+    event_name: "interactionCreate",
+    run: (client, interaction) => {},
+  };
     `,
   invalidRequestWarning: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class InvalidRequestWarningEvent extends BaseEvent {
-    constructor() {
-      super('invalidRequestWarning');
-    }
-
-    async run(client, invalidRequestWarningData) {
-      
-    }
-  }
+  module.exports = {
+    event_name: "invalidRequestWarning",
+    run: (client, interaction) => {},
+  };
     `,
   channelCreate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class ChannelCreateEvent extends BaseEvent {
-    constructor() {
-      super('channelCreate');
-    }
-    
-    async run(client, channel) {
-
-    }
-  }`,
+  module.exports = {
+    event_name: "channelCreate",
+    run: (client, interaction) => {},
+  };
+    `,
   channelDelete: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class ChannelDeleteEvent extends BaseEvent {
-    constructor() {
-      super('channelDelete');
-    }
-    
-    async run(client, channel) {
-
-    }
-  }
-  `,
+  module.exports = {
+    event_name: "channelDelete",
+    run: (client, interaction) => {},
+  };
+    `,
   channelPinsUpdate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class ChannelPinsUpdateEvent extends BaseEvent {
-    constructor() {
-      super('channelPinsUpdate');
-    }
-    
-    async run(client, channel, time) {
-
-    }
-  }`,
+  module.exports = {
+    event_name: "channelPinsUpdate",
+    run: (client, interaction) => {},
+  };
+    `,
   channelUpdate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class ChannelUpdateEvent extends BaseEvent {
-    constructor() {
-      super('channelUpdate');
-    }
-    
-    async run(client, oldChannel, newChannel) {
-
-    }
-  }`,
+  module.exports = {
+    event_name: "channelUpdate",
+    run: (client, interaction) => {},
+  };
+    `,
   debug: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class ChannelPinsUpdateEvent extends BaseEvent {
-    constructor() {
-      super('channelPinsUpdate');
-    }
-    
-    async run(client, info) {
-
-    }
-  }`,
+  module.exports = {
+    event_name: "debug",
+    run: (client, interaction) => {},
+  };
+    `,
   emojiCreate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class EmojiCreateEvent extends BaseEvent {
-    constructor() {
-      super('emojiCreate');
-    }
-    
-    async run(client, emoji) {
-
-    }
-  }
-  `,
+  module.exports = {
+    event_name: "emojiCreate",
+    run: (client, interaction) => {},
+  };
+    `,
   emojiDelete: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class EmojiDeleteEvent extends BaseEvent {
-    constructor() {
-      super('emojiDelete');
-    }
-    
-    async run(client, emoji) {
-
-    }
-  }`,
+  module.exports = {
+    event_name: "emojiDelete",
+    run: (client, interaction) => {},
+  };
+    `,
   emojiUpdate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class EmojiUpdateEvent extends BaseEvent {
-    constructor() {
-      super('emojiUpdate');
-    }
-    
-    async run(client, oldEmoji, newEmoji) {
-
-    }
-  }`,
+  module.exports = {
+    event_name: "emojiUpdate",
+    run: (client, interaction) => {},
+  };
+    `,
   error: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class ErrorEvent extends BaseEvent {
-    constructor() {
-      super('error');
-    }
-    
-    async run(client, error) {
-
-    }
-  }
-  `,
+  module.exports = {
+    event_name: "error",
+    run: (client, interaction) => {},
+  };
+    `,
   guildBanAdd: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class GuildBanAddEvent extends BaseEvent {
-    constructor() {
-      super('guildBanAdd');
-    }
-    
-    async run(client, guildBan) {
-
-    }
-  }`,
+  module.exports = {
+    event_name: "guildBanAdd",
+    run: (client, interaction) => {},
+  };
+    `,
   guildBanRemove: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class GuildBanRemoveEvent extends BaseEvent {
-    constructor() {
-      super('guildBanRemove');
-    }
-    
-    async run(client, guildBan) {
-
-    }
-  }`,
+  module.exports = {
+    event_name: "guildBanRemove",
+    run: (client, interaction) => {},
+  };
+    `,
   guildCreate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class GuildCreateEvent extends BaseEvent {
-    constructor() {
-      super('guildCreate');
-    }
-    
-    async run(client, guild) {
-
-    }
-  }`,
+  module.exports = {
+    event_name: "guildCreate",
+    run: (client, interaction) => {},
+  };
+    `,
   guildDelete: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class GuildDeleteEvent extends BaseEvent {
-    constructor() {
-      super('guildDelete');
-    }
-    
-    async run(client, guild) {
-
-    }
-  }`,
+  module.exports = {
+    event_name: "guildDelete",
+    run: (client, interaction) => {},
+  };
+    `,
   guildIntegrationsUpdate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class GuildIntegrationsUpdateEvent extends BaseEvent {
-    constructor() {
-      super('guildIntegrationsUpdate');
-    }
-    
-    async run(client, guild) {
-
-    }
-  }`,
+  module.exports = {
+    event_name: "guildIntegrationsUpdate",
+    run: (client, interaction) => {},
+  };
+    `,
   guildMemberAdd: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class GuildMemberAddEvent extends BaseEvent {
-    constructor() {
-      super('guildMemberAdd');
-    }
-    
-    async run(client, member) {
-
-    }
-  }`,
+  module.exports = {
+    event_name: "guildMemberAdd",
+    run: (client, interaction) => {},
+  };
+    `,
   guildMemberRemove: `
-    const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class GuildMemberRemoveEvent extends BaseEvent {
-    constructor() {
-      super('guildMemberRemove');
-    }
-    
-    async run(client, member) {
-
-    }
-  }`,
+  module.exports = {
+    event_name: "guildMemberRemove",
+    run: (client, interaction) => {},
+  };
+    `,
   guildMemberSpeaking: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class GuildMemberSpeakingEvent extends BaseEvent {
-    constructor() {
-      super('guildMemberSpeaking');
-    }
-    
-    async run(client, member, speaking) {
-
-    }
-  }`,
+  module.exports = {
+    event_name: "guildMemberSpeaking",
+    run: (client, interaction) => {},
+  };
+    `,
   guildMemberUpdate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class GuildMemberUpdateEvent extends BaseEvent {
-    constructor() {
-      super('guildMemberUpdate');
-    }
-    
-    async run(client, oldMember, newMember) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "guildMemberUpdate",
+    run: (client, interaction) => {},
+  };
+    `,
   guildUnavailable: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class GuildUnavailableEvent extends BaseEvent {
-    constructor() {
-      super('guildUnavailable');
-    }
-    
-    async run(client, guild) {
-
-    }
-  }`,
+  module.exports = {
+    event_name: "guildUnavailable",
+    run: (client, interaction) => {},
+  };
+    `,
   guildUpdate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class GuildUpdateEvent extends BaseEvent {
-    constructor() {
-      super('guildUpdate');
-    }
-    
-    async run(client, oldGuild, newGuild) {
-
-    }
-  }`,
+  module.exports = {
+    event_name: "guildUpdate",
+    run: (client, interaction) => {},
+  };
+    `,
   invalidated: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class InvalidatedEvent extends BaseEvent {
-    constructor() {
-      super('invalidated');
-    }
-    
-    async run(client) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "invalidated",
+    run: (client, interaction) => {},
+  };
+    `,
   inviteCreate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class EmojiDeleteEvent extends BaseEvent {
-    constructor() {
-      super('inviteCreate');
-    }
-    
-    async run(client, invite) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "inviteCreate",
+    run: (client, interaction) => {},
+  };
+    `,
   inviteDelete: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class InviteDeleteEvent extends BaseEvent {
-    constructor() {
-      super('inviteDelete');
-    }
-    
-    async run(client, invite) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "inviteDelete",
+    run: (client, interaction) => {},
+  };
+    `,
   ready: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class ReadyEvent extends BaseEvent {
-    constructor() {
-      super('ready');
-    }
-    
-    async run(client) {
-
-    }
-  }`,
+  module.exports = {
+    event_name: "ready",
+    run: (client, interaction) => {},
+  };
+    `,
   messageCreate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class MessageEvent extends BaseEvent {
-    constructor() {
-      super('messageCreate');
-    }
-    
-    async run(client, message) {
-        
-    }
-  }`,
+  module.exports = {
+    event_name: "messageCreate",
+    run: (client, interaction) => {},
+  };
+    `,
   messageDelete: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class MessageDeleteEvent extends BaseEvent {
-    constructor() {
-      super('messageDelete');
-    }
-    
-    async run(client, message) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "messageDelete",
+    run: (client, interaction) => {},
+  };
+    `,
   messageDeleteBulk: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class MessageDeleteBulkEvent extends BaseEvent {
-    constructor() {
-      super('messageDeleteBulk');
-    }
-    
-    async run(client, messages) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "messageDeleteBulk",
+    run: (client, interaction) => {},
+  };
+    `,
   messageReactionAdd: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class MessageReactionAddEvent extends BaseEvent {
-    constructor() {
-      super('messageReactionAdd');
-    }
-    
-    async run(client, reaction, user) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "messageReactionAdd",
+    run: (client, interaction) => {},
+  };
+    `,
   messageReactionRemove: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class MessageReactionRemoveEvent extends BaseEvent {
-    constructor() {
-      super('messageReactionRemove');
-    }
-    
-    async run(client, reaction, user) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "messageReactionRemove",
+    run: (client, interaction) => {},
+  };
+    `,
   messageReactionRemoveAll: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class MessageReactionRemoveAllEvent extends BaseEvent {
-    constructor() {
-      super('ready');
-    }
-    
-    async run(client, message) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "messageReactionRemoveAll",
+    run: (client, interaction) => {},
+  };
+    `,
   messageReactionRemoveEmoji: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class MessageReactionRemoveEmojiEvent extends BaseEvent {
-    constructor() {
-      super('messageReactionRemoveEmoji');
-    }
-    
-    async run(client, reaction) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "messageReactionRemoveEmoji",
+    run: (client, interaction) => {},
+  };
+    `,
   messageUpdate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class MessageUpdateEvent extends BaseEvent {
-    constructor() {
-      super('messageUpdate');
-    }
-    
-    async run(client, oldMessage, newMessage) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "messageUpdate",
+    run: (client, interaction) => {},
+  };
+    `,
   presenceUpdate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class PresenceUpdateEvent extends BaseEvent {
-    constructor() {
-      super('presenceUpdate');
-    }
-    
-    async run(client, oldPresence, newPresence) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "presenceUpdate",
+    run: (client, interaction) => {},
+  };
+    `,
   rateLimit: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class RateLimitEvent extends BaseEvent {
-    constructor() {
-      super('rateLimit');
-    }
-    
-    async run(client, rateLimitInfo) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "rateLimit",
+    run: (client, interaction) => {},
+  };
+    `,
   roleCreate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class RoleCreateEvent extends BaseEvent {
-    constructor() {
-      super('roleCreate');
-    }
-    
-    async run(client, role) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "roleCreate",
+    run: (client, interaction) => {},
+  };
+    `,
   roleDelete: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class RoleDeleteEvent extends BaseEvent {
-    constructor() {
-      super('roleDelete');
-    }
-    
-    async run(client, role) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "roleDelete",
+    run: (client, interaction) => {},
+  };
+    `,
   roleUpdate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class RoleUpdateEvent extends BaseEvent {
-    constructor() {
-      super('roleUpdate');
-    }
-    
-    async run(client, oldRole, newRole) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "roleUpdate",
+    run: (client, interaction) => {},
+  };
+    `,
   shardDisconnect: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class ShardDisconnectEvent extends BaseEvent {
-    constructor() {
-      super('shardDisconnect');
-    }
-    
-    async run(client, event, id) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "shardDisconnect",
+    run: (client, interaction) => {},
+  };
+    `,
   shardError: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class ShardErrorEvent extends BaseEvent {
-    constructor() {
-      super('shardError');
-    }
-    
-    async run(client, error, shardId) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "shardError",
+    run: (client, interaction) => {},
+  };
+    `,
   shardReady: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class EmojiDeleteEvent extends BaseEvent {
-    constructor() {
-      super('shardReady');
-    }
-    
-    async run(client, id, unavailableGuilds) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "shardReady",
+    run: (client, interaction) => {},
+  };
+    `,
   shardReconnecting: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class ShardReconnectingEvent extends BaseEvent {
-    constructor() {
-      super('shardReconnecting');
-    }
-    
-    async run(client, id) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "shardReconnecting",
+    run: (client, interaction) => {},
+  };
+    `,
   shardResume: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class ShardResumeEvent extends BaseEvent {
-    constructor() {
-      super('shardResume');
-    }
-    
-    async run(client, id, replayedEvents) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "shardResume",
+    run: (client, interaction) => {},
+  };
+    `,
   stageInstanceCreate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class StageInstanceCreateEvent extends BaseEvent {
-    constructor() {
-      super('stageInstanceCreate');
-    }
-
-    async run(client, stageInstance) {
-
-    }
-  }`,
+  module.exports = {
+    event_name: "stageInstanceCreate",
+    run: (client, interaction) => {},
+  };
+    `,
   stageInstanceDelete: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class StageInstanceDeleteEvent extends BaseEvent {
-    constructor() {
-      super('stageInstanceDelete');
-    }
-
-    async run(client, stageInstance) {
-
-    }
-  }
+  module.exports = {
+    event_name: "stageInstanceDelete",
+    run: (client, interaction) => {},
+  };
     `,
   stageInstanceUpdate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class StageInstanceUpdateEvent extends BaseEvent {
-    constructor() {
-      super('stageInstanceUpdate');
-    }
-
-    async run(client, oldStageInstance, newStageInstance) {
-
-    }
-  }`,
+  module.exports = {
+    event_name: "stageInstanceUpdate",
+    run: (client, interaction) => {},
+  };
+    `,
   stickerCreate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class StickerCreateEvent extends BaseEvent {
-    constructor() {
-      super('stickerCreate');
-    }
-
-    async run(client, sticker) {
-    }
-  }`,
+  module.exports = {
+    event_name: "stickerCreate",
+    run: (client, interaction) => {},
+  };
+    `,
   stickerDelete: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class StickerDeleteEvent extends BaseEvent {
-    constructor() {
-      super('stickerDelete');
-    }
-
-    async run(client, sticker) {
-    }
-  }`,
+  module.exports = {
+    event_name: "stickerDelete",
+    run: (client, interaction) => {},
+  };
+    `,
   stickerUpdate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class StickerUpdateEvent extends BaseEvent {
-    constructor() {
-      super('stickerUpdate');
-    }
-
-    async run(client, oldSticker, newSticker) {
-
-    }
-  }`,
+  module.exports = {
+    event_name: "stickerUpdate",
+    run: (client, interaction) => {},
+  };
+    `,
   threadCreate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class ThreadCreateEvent extends BaseEvent {
-    constructor() {
-      super('threadCreate');
-    }
-
-    async run(client, thread) {
-
-    }
-  }`,
+  module.exports = {
+    event_name: "threadCreate",
+    run: (client, interaction) => {},
+  };
+    `,
   threadDelete: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class ThreadDeleteEvent extends BaseEvent {
-    constructor() {
-      super('threadDelete');
-    }
-
-    async run(client, thread) {
-
-    }
-  }`,
+  module.exports = {
+    event_name: "threadDelete",
+    run: (client, interaction) => {},
+  };
+    `,
   threadListSync: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class ThreadListSyncEvent extends BaseEvent {
-    constructor() {
-      super('threadListSync');
-    }
-
-    async run(client, threads) {
-    }
-  }`,
+  module.exports = {
+    event_name: "threadListSync",
+    run: (client, interaction) => {},
+  };
+    `,
   threadMembersUpdate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class ThreadMembersUpdateEvent extends BaseEvent {
-    constructor() {
-      super('threadMembersUpdate');
-    }
-
-    async run(client, oldMembers, newMembers) {
-
-    }
-  }`,
+  module.exports = {
+    event_name: "threadMembersUpdate",
+    run: (client, interaction) => {},
+  };
+    `,
   threadMemberUpdate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class ThreadMemberUpdateEvent extends BaseEvent {
-    constructor() {
-      super('threadMemberUpdate');
-    }
-
-    async run(client, oldMember, newMember) {
-
-    }
-  }`,
+  module.exports = {
+    event_name: "threadMemberUpdate",
+    run: (client, interaction) => {},
+  };
+    `,
   threadUpdate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class ThreadUpdateEvent extends BaseEvent {
-    constructor() {
-      super('threadUpdate');
-    }
-    
-    async run(client, oldMembers, newMembers) {
-
-    }
-  }`,
+  module.exports = {
+    event_name: "threadUpdate",
+    run: (client, interaction) => {},
+  };
+    `,
   typingStart: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class TypingStartEvent extends BaseEvent {
-    constructor() {
-      super('typingStart');
-    }
-    
-    async run(client, typing) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "typingStart",
+    run: (client, interaction) => {},
+  };
+    `,
   userUpdate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class UserUpdateEvent extends BaseEvent {
-    constructor() {
-      super('userUpdate');
-    }
-    
-    async run(client, oldUser, newUser) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "userUpdate",
+    run: (client, interaction) => {},
+  };
+    `,
   voiceStateUpdate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class WoiceStateUpdateEvent extends BaseEvent {
-    constructor() {
-      super('voiceStateUpdate');
-    }
-    
-    async run(client, oldState, newState) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "voiceStateUpdate",
+    run: (client, interaction) => {},
+  };
+    `,
   warn: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class WarnEvent extends BaseEvent {
-    constructor() {
-      super('warn');
-    }
-    
-    async run(client, info) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "warn",
+    run: (client, interaction) => {},
+  };
+    `,
   webhookUpdate: `
-  const BaseEvent = require('../utils/structures/BaseEvent');
-  module.exports = class WebhookUpdateEvent extends BaseEvent {
-    constructor() {
-      super('webhookUpdate');
-    }
-    
-    async run(client, channel) {
-      
-    }
-  }`,
+  module.exports = {
+    event_name: "webhookUpdate",
+    run: (client, interaction) => {},
+  };
+    `,
 };
 
-module.exports = eventTemplates;
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+const getEventName = (name) => `${capitalize(name)}Event.js`;
+
+async function generateEvents(events) {
+  console.log("Generating the selected events ...");
+  const d = path.join(process.cwd(), "src");
+  const di = path.join(d, "events");
+  const dir = path.join(di, "other");
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+  for (const event of events) {
+    const fileName = getEventName(event);
+    const template = await getTemplate(event);
+    if (fs.existsSync(path.join(dir, fileName)))
+      return console.log(
+        chalk.red.bold("Error you already have that event if you want another one of the same event rename the one you already have!")
+      );
+    fs.writeFileSync(path.join(dir, fileName), template);
+    console.log(chalk.cyan(`Successfully generated ${event} event!`));
+  }
+  return console.log(chalk.white.bold("The selected events were successfully generated!"));
+}
+
+async function getTemplate(event) {
+  return eventTemplates[event];
+}
+
+module.exports = generateEvents;

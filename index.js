@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 const inquirer = require("inquirer");
-const {generateProject, generateEvents} = require("./gen/Hedystia-Message");
+const generateEvents = require("./gen/Hedystia-Events");
+const generateMessageProject = require("./gen/Hedystia-Message");
+const generateInteractionProject = require("./gen/Hedystia-Slash");
 
 inquirer
   .prompt([
@@ -37,7 +39,7 @@ inquirer
       when: ({command}) => command === "Create new project",
       message: "Prefix or Slash?",
       name: "prefixorslash",
-      choices: ["Prefix", "Slash (Coming soon)"],
+      choices: ["Prefix", "Slash"],
     },
     {
       type: "input",
@@ -123,12 +125,17 @@ inquirer
   ])
   .then((data) => {
     if (data.command === "Create new project") {
-      if (data.prefixorslash === "Prefix") {
-        const name = data.projectName.toLowerCase().replace(/\s+/g, "-");
-        const dir = data.selectDir;
-        const prefix = data.prefix;
-        const token = data.projectToken;
-        generateProject(name, dir, prefix, token);
+      const name = data.projectName.toLowerCase().replace(/\s+/g, "-");
+      const dir = data.selectDir;
+      const token = data.projectToken;
+      switch (data.prefixorslash) {
+        case "Prefix":
+          const prefix = data.prefix;
+          generateMessageProject(name, dir, prefix, token);
+          break;
+        case "Slash":
+          generateInteractionProject(name, dir, token);
+          break;
       }
     }
     if (data.command === "Generate event") {

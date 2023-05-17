@@ -14,9 +14,8 @@ function generateHedystiaFile(dir, name) {
   fs.writeFileSync(path.join(dir, "hedystia.json"), str);
 }
 
-function generateConfigFile(dir, prefix, token) {
+function generateConfigFile(dir, token) {
   const str = `module.exports = {
-        prefix: "${prefix}",
         token: "${token}"
     }
     `;
@@ -33,7 +32,7 @@ function generateMainFile(dir) {
   client.slash = new Map();
   client.aliases = new Map();
   client.setMaxListeners(0);
-  require("./handler/loadCommands")(client);
+  require("./handler/loadSlashCommands")(client);
   require("./handler/loadEvents")(client);
   client.login(token);
   
@@ -63,44 +62,38 @@ function generatePackageJSON(dir, name) {
   fs.writeFileSync(path.join(dir, "package.json"), str);
 }
 
-function generateMessageEvent(dir) {
-  const str = `const escapeRegex = (str) => str.replace(/[.*+?^\${}()|[\\]\\\\]/g, "\\\\$&");
-  const config = require("../../config");
-  
-  module.exports = {
-    event_name: "messageCreate",
-    run: (client, message) => {
-      const PREFIX = config.prefix;
-      if (message.author.bot) return;
-      if (message.guild.members.me.isCommunicationDisabled()) return;
-      if (!message.guild.members.me.permissionsIn(message.channel).has("SendMessages")) return;
-      const prefixRegex = new RegExp(\`^(<@!?$\{client.user.id}>|$\{escapeRegex(PREFIX)})\\\\s*\`);
-      if (!prefixRegex.test(message.content)) return;
-      const [, matchedPrefix] = message.content.match(prefixRegex);
-      const p = matchedPrefix.length;
-      const args = message.content.slice(p).trim().split(/ +/);
-      const commandName = args.shift().toLowerCase();
-      const command = client.commands.get(commandName);
-      if (!command) return;
-      if (!message.member.permissions.has(command.userPerms || [])) {
-        return message.reply(\`You need the permission of  $\{command.userPerms}\`);
+function generateInteractionEvent(dir) {
+  const str = `module.exports = {
+    event_name: "interactionCreate",
+    run: (client, interaction) => {
+      if (interaction.type !== 2) return;
+      const command = client.slash.get(interaction.commandName);
+      if (!command) return interaction.reply({content: "Error"});
+      if (!interaction.member.permissions.has(command.userPerms || [])) {
+        return interaction.reply({
+          content: \`You need the permission of  \\\`\${command.userPerms}\\\`\`,
+          ephemeral: true,
+        });
       }
-      if (!message.guild.members.me.permissions.has(command.botPerms || [])) {
-        return message.reply(\`I need the permission of $\{command.botPerms}\`);
+      if (!interaction.guild.members.me.permissions.has(command.botPerms || [])) {
+        return interaction.reply({
+          content: \`I need the permission of \\\`\${command.botPerms}\\\`\`,
+          ephemeral: true,
+        });
       }
-      command.run(client, message, args, p);
+      command.run(client, interaction);
     },
   };
   `;
-  fs.writeFileSync(path.join(dir, "core", "command.js"), str);
+  fs.writeFileSync(path.join(dir, "core", "slash.js"), str);
 }
 
 function generatePingCommand(dir) {
   const str = `module.exports = {
     name: "ping",
     description: "Get the ping of the bot!",
-    run: async (client, message, args) => {
-      message.channel.send({
+    run: async (client, interaction) => {
+      interaction.reply({
         content: \`🏓 Pong!\\n\\\`\\\`\\\`yml\\n\` + Math.round(client.ws.ping) + \`ms\\\`\\\`\\\`\`,
       });
     },
@@ -123,26 +116,6 @@ function generateReadyEvent(dir) {
 }
 
 function generateHandlerFiles(dir, dir_struct) {
-  const loadCommands = `const { readdirSync } = require("fs");
-  async function loadCommands(client) {
-    const commandFolders = readdirSync("./src/commands");
-    for (const folder of commandFolders) {
-      const commandFiles = readdirSync(\`./src/commands/\${folder}\`).filter((file) => file.endsWith(".js"));
-      for (const file of commandFiles) {
-        const command = require(\`../commands/\${folder}/\${file}\`);
-        if (command.name) {
-          client.commands.set(command.name, command);
-        } else {
-          continue;
-        }
-        if (command.aliases && Array.isArray(command)) command.aliases.forEach((alias) => client.aliases.set(alias, command.name));
-      }
-    }
-  }
-  
-  module.exports = loadCommands;
-  `;
-
   const loadEvents = `const { readdirSync } = require("fs");
   async function loadEvents(client) {
     const eventFolders = readdirSync("./src/events");
@@ -162,11 +135,35 @@ function generateHandlerFiles(dir, dir_struct) {
   module.exports = loadEvents;
   `;
 
-  fs.writeFileSync(path.join(dir, "loadCommands.js"), loadCommands);
+  const loadSlashCommands = `const { readdirSync } = require("fs");
+  async function loadSlashCommands(client) {
+    let slash = [];
+    const commandFolders = readdirSync("./src/slash");
+    for (const folder of commandFolders) {
+      const commandFiles = readdirSync(\`./src/slash/\${folder}\`).filter((file) => file.endsWith(".js"));
+      for (const file of commandFiles) {
+        const command = require(\`../slash/\${folder}/\${file}\`);
+        if (command.name) {
+          client.slash.set(command.name, command);
+          slash.push(command);
+        } else {
+          continue;
+        }
+      }
+    }
+    client.on("ready", async () => {
+      await client.application.commands.set(slash);
+    });
+  }
+  
+  module.exports = loadSlashCommands;
+  `;
+
   fs.writeFileSync(path.join(dir, "loadEvents.js"), loadEvents);
+  fs.writeFileSync(path.join(dir, "loadSlashCommands.js"), loadSlashCommands);
 }
 
-function generateMessageProject(name, dir, prefix, token) {
+function generateInteractionProject(name, dir, token) {
   var projectPath;
   if (dir === "Inside") {
     projectPath = path.join(process.cwd(), `${name}`);
@@ -177,9 +174,9 @@ function generateMessageProject(name, dir, prefix, token) {
   console.log("Generating project ...");
   const srcPath = path.join(projectPath, "src");
   const handlerPath = path.join(srcPath, "handler");
-  const commandsPath = path.join(srcPath, "commands");
+  const slashPath = path.join(srcPath, "slash");
   const eventsPath = path.join(srcPath, "events");
-  const pingCommandFolder = path.join(commandsPath, "info");
+  const pingCommandFolder = path.join(slashPath, "info");
   const clientEventFolder = path.join(eventsPath, "client");
   const coreEventFolder = path.join(eventsPath, "core");
   if (dir === "Inside") {
@@ -187,17 +184,17 @@ function generateMessageProject(name, dir, prefix, token) {
   }
   fs.mkdirSync(srcPath);
   fs.mkdirSync(handlerPath);
-  fs.mkdirSync(commandsPath);
+  fs.mkdirSync(slashPath);
   fs.mkdirSync(eventsPath);
   fs.mkdirSync(pingCommandFolder);
   fs.mkdirSync(clientEventFolder);
   fs.mkdirSync(coreEventFolder);
   generateHedystiaFile(projectPath, name);
-  generateConfigFile(srcPath, prefix, token);
+  generateConfigFile(srcPath, token);
   generateMainFile(srcPath);
   generatePackageJSON(projectPath, name);
-  generateMessageEvent(eventsPath);
-  generatePingCommand(commandsPath);
+  generateInteractionEvent(eventsPath);
+  generatePingCommand(slashPath);
   generateReadyEvent(eventsPath);
   generateHandlerFiles(handlerPath);
 
@@ -209,4 +206,4 @@ function generateMessageProject(name, dir, prefix, token) {
   console.log(chalk.white.bold(`\tTo start the project use npm start`));
 }
 
-module.exports = generateMessageProject;
+module.exports = generateInteractionProject;
