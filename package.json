@@ -1,6 +1,6 @@
 {
   "name": "hedystia.gen",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Discord bot gen",
   "main": "index.js",
   "bin": {

@@ -63,7 +63,7 @@ function generatePackageJSON(dir, name) {
     "author": "",
     "license": "ISC",
     "dependencies": {
-      "discord.js": "14.7.1"
+      "discord.js": "14.9.0"
     }
   }
   `;
