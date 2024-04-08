@@ -1,7 +1,7 @@
 ## Installation
 
 ```
-npm i --global hedystia.gen
+npm i --global @hedystia/gen
 ```
 
 ## Nodejs Version
