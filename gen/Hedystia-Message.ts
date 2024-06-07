@@ -6,7 +6,7 @@ function generateHedystiaFile(dir: string, name: string) {
   const str = `{
     "project": "${name}",
     "lib": {
-      "discord.js": "14.11.0"
+      "discord.js": "14.15.3"
     }
   }
   `;
