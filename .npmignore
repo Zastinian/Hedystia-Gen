@@ -2,3 +2,10 @@ node_modules/
 test/
 yarn.lock
 .git/
+bun.lockb
+pnpm-lock.yaml
+tsconfig.json
+*.ts
+biome.jsonc
+gen/
+.npmignore

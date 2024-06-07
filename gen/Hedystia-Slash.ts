@@ -1,9 +1,8 @@
-const fs = require("fs");
-const path = require("path");
-const {execSync} = require("child_process");
-const chalk = require("chalk");
+import fs from "fs";
+import path from "path";
+import { execSync } from "child_process";
 
-function generateHedystiaFile(dir, name) {
+function generateHedystiaFile(dir: string, name: string) {
   const str = `{
     "project": "${name}",
     "lib": {
@@ -14,7 +13,7 @@ function generateHedystiaFile(dir, name) {
   fs.writeFileSync(path.join(dir, "hedystia.json"), str);
 }
 
-function generateConfigFile(dir, token) {
+function generateConfigFile(dir: string, token: string) {
   const str = `module.exports = {
         token: "${token}"
     }
@@ -22,11 +21,11 @@ function generateConfigFile(dir, token) {
   fs.writeFileSync(path.join(dir, "config.js"), str);
 }
 
-function generateMainFile(dir) {
-  const str = `const {Client, GatewayIntentBits} = require("discord.js");
+function generateMainFile(dir: string) {
+  const str = `const {Client} = require("discord.js");
   const {token} = require("./config");
   const client = new Client({
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
+    intents: ["Guilds", "GuildMessages"],
   });
   client.commands = new Map();
   client.slash = new Map();
@@ -35,13 +34,13 @@ function generateMainFile(dir) {
   require("./handler/loadSlashCommands")(client);
   require("./handler/loadEvents")(client);
   client.login(token);
-  
+
     `;
 
   fs.writeFileSync(path.join(dir, "index.js"), str);
 }
 
-function generatePackageJSON(dir, name) {
+function generatePackageJSON(dir: string, name: string) {
   const str = `{
     "name": "${name}",
     "version": "1.0.0",
@@ -55,14 +54,14 @@ function generatePackageJSON(dir, name) {
     "author": "",
     "license": "ISC",
     "dependencies": {
-      "discord.js": "14.11.0"
+      "discord.js": "14.15.3"
     }
   }
   `;
   fs.writeFileSync(path.join(dir, "package.json"), str);
 }
 
-function generateInteractionEvent(dir) {
+function generateInteractionEvent(dir: string) {
   const str = `module.exports = {
     event_name: "interactionCreate",
     run: (client, interaction) => {
@@ -88,7 +87,7 @@ function generateInteractionEvent(dir) {
   fs.writeFileSync(path.join(dir, "core", "slash.js"), str);
 }
 
-function generatePingCommand(dir) {
+function generatePingCommand(dir: string) {
   const str = `module.exports = {
     name: "ping",
     description: "Get the ping of the bot!",
@@ -102,7 +101,7 @@ function generatePingCommand(dir) {
   fs.writeFileSync(path.join(dir, "info", "ping.js"), str);
 }
 
-function generateReadyEvent(dir) {
+function generateReadyEvent(dir: string) {
   const str = `module.exports = {
     event_name: "ready",
     run: (client) => {
@@ -110,12 +109,12 @@ function generateReadyEvent(dir) {
       client.user.setStatus("dnd");
       client.user.setActivity("Hedystia Gen");
     },
-  };  
+  };
   `;
   fs.writeFileSync(path.join(dir, "client", "ready.js"), str);
 }
 
-function generateHandlerFiles(dir, dir_struct) {
+function generateHandlerFiles(dir: string) {
   const loadEvents = `const { readdirSync } = require("fs");
   async function loadEvents(client) {
     const eventFolders = readdirSync("./src/events");
@@ -131,7 +130,7 @@ function generateHandlerFiles(dir, dir_struct) {
       }
     }
   }
-  
+
   module.exports = loadEvents;
   `;
 
@@ -155,7 +154,7 @@ function generateHandlerFiles(dir, dir_struct) {
       await client.application.commands.set(slash);
     });
   }
-  
+
   module.exports = loadSlashCommands;
   `;
 
@@ -163,13 +162,18 @@ function generateHandlerFiles(dir, dir_struct) {
   fs.writeFileSync(path.join(dir, "loadSlashCommands.js"), loadSlashCommands);
 }
 
-function generateInteractionProject(name, dir, token) {
-  var projectPath;
+export default function generateInteractionProject(
+  name: string,
+  dir: string,
+  token: string,
+  install: string,
+  packageManager: string,
+) {
+  let projectPath = path.join(process.cwd());
   if (dir === "Inside") {
     projectPath = path.join(process.cwd(), `${name}`);
-    if (fs.existsSync(projectPath)) return console.log(`The directory with name ${name} already exists`);
-  } else if (dir === "Outside") {
-    projectPath = path.join(process.cwd());
+    if (fs.existsSync(projectPath))
+      return console.log(`The directory with name ${name} already exists`);
   }
   console.log("Generating project ...");
   const srcPath = path.join(projectPath, "src");
@@ -198,12 +202,25 @@ function generateInteractionProject(name, dir, token) {
   generateReadyEvent(eventsPath);
   generateHandlerFiles(handlerPath);
 
-  console.log("Installing dependencies ...");
-  execSync("npm install", {cwd: projectPath});
+  if (install === "Yes") {
+    console.log("Installing dependencies ...");
+    switch (packageManager) {
+      case "npm":
+        execSync("npm install", { cwd: projectPath });
+        break;
+      case "pnpm":
+        execSync("pnpm install", { cwd: projectPath });
+        break;
+      case "yarn":
+        execSync("yarn install", { cwd: projectPath });
+        break;
+      case "bun":
+        execSync("bun install", { cwd: projectPath });
+        break;
+    }
+  }
   if (dir === "Inside") {
     console.log(`\n\tTo enter the project directory use cd ./${name}`);
   }
-  console.log(chalk.white.bold(`\tTo start the project use npm start`));
+  console.log("\x1b[97m\tTo start the project use npm start\x1b[0m");
 }
-
-module.exports = generateInteractionProject;

@@ -1,12 +1,13 @@
 {
   "name": "@hedystia/gen",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "Discord bot gen",
-  "main": "index.js",
+  "main": "dist/index.js",
   "bin": {
-    "gen": "index.js",
-    "hedystia-gen": "index.js"
+    "gen": "dist/index.js",
+    "hedystia-gen": "dist/index.js"
   },
+  "type": "commonjs",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Zastinian/Hedystia-Gen.git"
@@ -16,23 +17,21 @@
   },
   "homepage": "https://github.com/Zastinian/Hedystia-Gen#readme",
   "scripts": {
-    "start": "node index.js"
+    "start": "node dist/index.js",
+    "check": "biome ci .",
+    "lint": "biome lint --write .",
+    "format": "biome format --write ."
   },
-  "keywords": [
-    "discord.js",
-    "discord bot",
-    "bot gen",
-    "gen"
-  ],
+  "keywords": ["discord.js", "discord bot", "bot gen", "gen"],
   "author": "contact@hedystia.com",
   "license": "ISC",
   "dependencies": {
-    "chalk": "4.1.2",
-    "child_process": "^1.0.2",
-    "inquirer": "^8.0.0"
+    "inquirer": "^8.2.6"
   },
   "devDependencies": {
-    "@types/inquirer": "^8.2.1"
+    "@biomejs/biome": "^1.8.0",
+    "@types/inquirer": "^8.2.10",
+    "typescript": "^5.4.5"
   },
   "publishConfig": {
     "access": "public"

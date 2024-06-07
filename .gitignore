@@ -1,2 +1,5 @@
 node_modules/
 yarn.lock
+bun.lockb
+pnpm-lock.yaml
+dist/
