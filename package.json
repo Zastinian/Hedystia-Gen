@@ -3,7 +3,6 @@
   "version": "1.8.0",
   "description": "Discord bot gen",
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "bin": {
     "gen": "dist/index.js",
     "hedystia-gen": "dist/index.js"
